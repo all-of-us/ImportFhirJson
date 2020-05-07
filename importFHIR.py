@@ -17,7 +17,7 @@ def getFileList(path):
 
 def DBSetup(conn):
     c=conn.cursor()
-    c.execute('CREATE TABLE IDMap (oldID text, resourceType text, newID text);')
+    c.execute('CREATE TABLE IF NOT EXISTS IDMap (oldID text, resourceType text, newID text);')
     conn.commit()
 
 def mappingExists(conn,entity):
