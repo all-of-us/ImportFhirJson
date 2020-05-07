@@ -49,9 +49,9 @@ def fixEntity(conn,entity):
         
 
 def postEntity(entity,args):
-    return "tempnewID",True
+    # return "tempnewID",True
     entity.pop('id')
-    entity.pop('meta')
+    entity.pop('meta',None)
     response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'),json=entity)
     if(response.status_code!=201):
         # Error code 500 is a backend error, or an import error
