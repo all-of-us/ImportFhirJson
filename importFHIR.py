@@ -89,8 +89,9 @@ def cleanUp(conn,args):
 
 def deleteFromServer(row,args):
     print(row)
-    response = requests.delete("{}{}/{}".format(args.server,row.get('resourceType'),row.get('newID')),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'))
+    response = requests.delete("{}{}/{}".format(args.server,row[1],row[2]),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'))
     print(response.status_code)
+    # 204 is successful deletion
     print(response.text)
 
 if __name__ == "__main__":
@@ -106,8 +107,9 @@ if __name__ == "__main__":
 
     fileList=getFileList(args.folder)
     conn=sqlite3.connect(args.database_name)
-    # if(args.clean):
-
+    if(args.clean):
+        cleanUp(conn,args)
+        exit()
     DBSetup(conn)
     print(len(fileList))
     print(fileList)
