@@ -47,18 +47,30 @@ def fixEntity(conn,entity):
             return entity,False
         
 
-# def postEntity(entity)
+def postEntity(entity,args):
+    return "tempnewID",True
+    entity.pop('id')
+    entity.pop('meta')
+    response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'),json=entity)
+    if(response.status_code!=200):
+        # there must have been an error
+        return "",False
+    newLocation=response.headers.get('Location').split("/")
+    newID=newLocation[len(newLocation)-1]
+    return newID,True
 
-def processFile(conn,entity):
-    c=conn.cursor()
+def processFile(conn,entity,args):
     oldID=entity.get('id')
     resourceType=entity.get('resourceType')
     if(resourceType!="Patient"):
         entity,successful=fixEntity(conn,entity)
         if(not successful):
             return False
-    # postEntity()
-    c.execute("INSERT INTO IDMap VALUES('{}','{}','{}');".format(oldID,resourceType,oldID))
+    newID,successful=postEntity(entity,args)
+    if(not successful):
+        return False
+    c=conn.cursor()
+    c.execute("INSERT INTO IDMap VALUES('{}','{}','{}');".format(oldID,resourceType,newID))
     conn.commit()
     return True
 
@@ -86,7 +98,7 @@ if __name__ == "__main__":
     fileList=getFileList(args.folder)
     conn=sqlite3.connect(args.database_name)
     # if(args.clean):
-        
+
     DBSetup(conn)
     print(len(fileList))
     print(fileList)
@@ -123,7 +135,7 @@ if __name__ == "__main__":
             print("popping file, ",file)
             continue
         else:
-            if(processFile(conn,entity)):
+            if(processFile(conn,entity,args)):
                 # we successfully processed the file
                 addedFiles.append(file)
                 fileList.pop(0)
