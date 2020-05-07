@@ -82,7 +82,7 @@ def processFile(conn,entity,args):
 
 def cleanUp(conn,args):
     c=conn.cursor()
-    c.execute("SELECT * from IDMap;")
+    c.execute("SELECT * from IDMap ORDER By rowid DESC;")
     rows=c.fetchall()
     for row in rows:
         deleteFromServer(row,args)
