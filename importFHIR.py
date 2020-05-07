@@ -35,7 +35,7 @@ def fixEntity(conn,entity):
     c=conn.cursor()
     resourceType=entity.get('resourceType')
     if(resourceType=="Observation"):
-        refrence=entity.get('subject').get('reference').split('/')
+        reference=entity.get('subject').get('reference').split('/')
         referenceType=reference[0]
         referenceID=reference[1]
         c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
@@ -47,7 +47,7 @@ def fixEntity(conn,entity):
             return entity,False
         
 
-def postEntity(entity)
+# def postEntity(entity)
 
 def processFile(conn,entity):
     c=conn.cursor()
@@ -85,7 +85,8 @@ if __name__ == "__main__":
 
     fileList=getFileList(args.folder)
     conn=sqlite3.connect(args.database_name)
-    if(args.clean)
+    # if(args.clean):
+        
     DBSetup(conn)
     print(len(fileList))
     print(fileList)
