@@ -49,11 +49,12 @@ def fixEntity(conn,entity):
         
 
 def postEntity(entity,args):
-    # return "tempnewID",True
+    return "tempnewID",True
     entity.pop('id')
     entity.pop('meta')
     response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'),json=entity)
     if(response.status_code!=201):
+        # Error code 500 is a backend error, or an import error
         print(entity)
         print(response.status_code)
         print(response.text)
@@ -94,6 +95,39 @@ def deleteFromServer(row,args):
     # 204 is successful deletion
     print(response.text)
 
+def buildEntityList(fileList):
+    entityList=[]
+    for file in fileList:
+        with open(file,'r') as f:
+            try:
+                tempString=json.load(f)
+            except json.JSONDecodeError:
+                print("file {} is invalid json".format(file))
+                continue
+        if(tempString.get('resourceType',None)=="Bundle"):
+            i=0
+            for entity in tempString.get('entry'):
+                tempDict={}
+                tempDict['file']=file
+                tempDict['type']=3
+                tempDict['index']=i
+                entityList.append(tempDict)
+                i=i+1
+        elif(tempString.get('resource',None)):
+            # print("format one")
+            tempDict={}
+            tempDict['file']=file
+            tempDict['type']=1
+            entityList.append(tempDict)
+        else:
+            # print("format two")
+            tempDict={}
+            tempDict['file']=file
+            tempDict['type']=2
+            entityList.append(tempDict)
+
+    return entityList
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="""
         This will go through all files in the specified folder ({} by default), and import them to the omoponfhir server provided ({} by default)
@@ -112,29 +146,27 @@ if __name__ == "__main__":
         exit()
     DBSetup(conn)
     print(len(fileList))
-    print(fileList)
+    # print(fileList)
     iteration=0
-    addedFiles=[]
-    skippedFiles=[]
-    maxIterations=len(fileList)*len(fileList)
-    maxIterations=len(fileList)
-    while fileList:
+    addedEntities=[]
+    skippedEntities=[]
+    
+    # maxIterations=len(fileList)
+    entityList=buildEntityList(fileList)
+    maxIterations=len(entityList)*len(entityList)
+    # print(entityList)
+    while entityList:
+        fileEntity=entityList[0]
         if(iteration>=maxIterations):
             print("we have a problem file. ")
             print("exiting")
             break
-        file=fileList[0]
-        print(file)
-        with open(file,'r') as f:
-            try:
-                tempString=json.load(f)
-            except json.JSONDecodeError:
-                print("file {} is invalid json".format(file))
-                print("popping file, ",file)
-                fileList.pop(0)
-                continue
-        # do I need to handle bundles? 
-        if(tempString.get('resource',None)):
+        print(fileEntity)
+        with open(fileEntity['file'],'r') as f:
+            tempString=json.load(f)
+        if(fileEntity['type']==3):
+            entity=tempString.get('entry')[fileEntity['index']].get('resource')
+        elif(fileEntity['type']==1):
             # print("format one")
             entity=tempString.get('resource')
         else:
@@ -142,23 +174,24 @@ if __name__ == "__main__":
             entity=tempString
         if(mappingExists(conn,entity)):
             # This entity already exists
-            skippedFiles.append(file)
-            fileList.pop(0)
-            print("popping file, ",file)
+            skippedEntities.append(fileEntity)
+            entityList.pop(0)
+            # print("popping entity, ",entity)
             continue
         else:
             if(processFile(conn,entity,args)):
                 # we successfully processed the file
-                addedFiles.append(file)
-                fileList.pop(0)
+                addedEntities.append(fileEntity)
+                entityList.pop(0)
             else:
                 # we failed importing
-                fileList.append(file)
-                fileList.pop(0)
+                entityList.append(fileEntity)
+                entityList.pop(0)
+                # This breaks when you have multiple entities per file
                 iteration=iteration+1
                 continue
         
         iteration=iteration+1
-    print("files not imported: ",fileList)
-    print(addedFiles)
-    print("files skipped as they're already imported: ",skippedFiles)
+    print("entities not imported: ",entityList)
+    print(addedEntities)
+    print("files skipped as they're already imported: ",skippedEntities)

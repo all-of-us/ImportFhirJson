@@ -1,0 +1,64 @@
+
+{
+    "resourceType":"Patient",
+    "id":"5007",
+    "text":{
+        "status":"generated",
+        "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Pritpal</p></div>"
+    },
+    "identifier":[
+        {
+            "system":"http://hospital.smarthealthit.org",
+            "value":"5007"
+        }
+    ],
+    "active":true,
+    "name":[
+        {
+            "family":[
+                "Gothra"
+            ],
+            "given":[
+                "Pritpal"
+            ]
+        }
+    ],
+    "telecom":[
+        {
+            "system":"phone",
+            "value":"774-275-0605",
+            "use":"home"
+        },
+        {
+            "system":"phone",
+            "value":"774-275-0605",
+            "use":"mobile"
+        },
+        {
+            "system":"email",
+            "value":"mailto:sidd.shah@hotmail.com"
+        }
+    ],
+    "gender":"male",
+    "birthDate":"1978-05-29",
+    "address":[
+        {
+            "use":"home",
+            "line":[
+                "3 S Country Club Road"
+            ],
+            "city":"Pleasanton",
+            "state":"CA",
+            "postalCode":"94588",
+            "country":"USA"
+        }
+    ],
+    "maritalStatus":{
+        "coding":[
+            {
+                "system":"http://hl7.org/fhir/marital-status",
+                "code":"U"
+            }
+        ]
+    }
+}
