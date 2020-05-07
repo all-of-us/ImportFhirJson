@@ -42,20 +42,26 @@ def fixEntity(conn,entity):
         result=c.fetchone()
         if(result):
             referenceID=result[2]
+            entity['subject']['reference']="{}/{}".format(referenceType,referenceID)
             return entity,True
         else:
             return entity,False
         
 
 def postEntity(entity,args):
-    return "tempnewID",True
+    # return "tempnewID",True
     entity.pop('id')
     entity.pop('meta')
     response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'),json=entity)
-    if(response.status_code!=200):
+    if(response.status_code!=201):
+        print(entity)
+        print(response.status_code)
+        print(response.text)
         # there must have been an error
         return "",False
+    print(response.status_code)
     newLocation=response.headers.get('Location').split("/")
+    print(newLocation)
     newID=newLocation[len(newLocation)-1]
     return newID,True
 
@@ -82,7 +88,10 @@ def cleanUp(conn,args):
         deleteFromServer(row,args)
 
 def deleteFromServer(row,args):
+    print(row)
     response = requests.delete("{}{}/{}".format(args.server,row.get('resourceType'),row.get('newID')),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'))
+    print(response.status_code)
+    print(response.text)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="""
@@ -106,6 +115,7 @@ if __name__ == "__main__":
     addedFiles=[]
     skippedFiles=[]
     maxIterations=len(fileList)*len(fileList)
+    maxIterations=len(fileList)
     while fileList:
         if(iteration>=maxIterations):
             print("we have a problem file. ")
