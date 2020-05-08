@@ -35,7 +35,8 @@ def mappingExists(conn,entity):
         
 
 def postEntity(entity,args):
-    return "tempnewID",True
+    if(entity.get('resourceType')!="Medication"):
+        return "tempnewID",True
     entity.pop('id')
     entity.pop('meta',None)
     response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'),json=entity)
@@ -97,9 +98,15 @@ def buildEntityList(fileList):
             except json.JSONDecodeError:
                 print("file {} is invalid json".format(file))
                 continue
+        if(tempString.get('resourceType',None)=="Medication"):
+            print("we don't handle medications, skipping file {}".format(file))
+            continue
         if(tempString.get('resourceType',None)=="Bundle"):
             i=0
             for entity in tempString.get('entry'):
+                if(entity.get('resourceType',None)=="Medication"):
+                    print("we don't handle medications, skipping file {} entity:{}".format(file,i))
+                    continue
                 tempDict={}
                 tempDict['file']=file
                 tempDict['type']=3
@@ -185,7 +192,6 @@ if __name__ == "__main__":
                 iteration=iteration+1
                 continue
         
-        # iteration=iteration+1
     print("entities not imported: ",entityList)
     print(addedEntities)
     print("files skipped as they're already imported: ",skippedEntities)

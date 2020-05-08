@@ -9,3 +9,4 @@ in OMOP, the measurement_date is required, in FHIR it is not. we will have issue
 
 ## Medication
 can contain Ingredients (which reference other Medications)
+We don't utilize medication types
