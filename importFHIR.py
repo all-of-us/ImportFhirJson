@@ -145,11 +145,10 @@ if __name__ == "__main__":
     addedEntities=[]
     skippedEntities=[]
     
-    # maxIterations=len(fileList)
     entityList=buildEntityList(fileList)
-    maxIterations=len(entityList)*len(entityList)
     # print(entityList)
     while entityList:
+        maxIterations=len(entityList)*2
         fileEntity=entityList[0]
         if(iteration>=maxIterations):
             print("we have a problem file. ")
@@ -170,6 +169,7 @@ if __name__ == "__main__":
             # This entity already exists
             skippedEntities.append(fileEntity)
             entityList.pop(0)
+            iteration=0
             # print("popping entity, ",entity)
             continue
         else:
@@ -177,6 +177,7 @@ if __name__ == "__main__":
                 # we successfully processed the file
                 addedEntities.append(fileEntity)
                 entityList.pop(0)
+                iteration=0
             else:
                 # we failed importing
                 entityList.append(fileEntity)
@@ -184,7 +185,7 @@ if __name__ == "__main__":
                 iteration=iteration+1
                 continue
         
-        iteration=iteration+1
+        # iteration=iteration+1
     print("entities not imported: ",entityList)
     print(addedEntities)
     print("files skipped as they're already imported: ",skippedEntities)
