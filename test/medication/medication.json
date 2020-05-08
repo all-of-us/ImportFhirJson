@@ -1,0 +1,17 @@
+{
+  "resourceType": "Medication",
+  "id": "501343",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><div class=\"hapiHeaderText\"> hepatitis B immune globulin </div></div>"
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "26744",
+        "display": "hepatitis B immune globulin"
+      }
+    ]
+  }
+}
