@@ -1,0 +1,44 @@
+{
+    "fullUrl":"http://api:8080/baseDstu2/Condition/smart-condition-120",
+    "resource":{
+        "resourceType":"Condition",
+        "id":"smart-condition-120",
+        "meta":{
+            "versionId":"9",
+            "lastUpdated":"2019-08-14T19:31:57.509+00:00",
+            "security":[
+                {
+                    "system":"http://smarthealthit.org/security/categories",
+                    "code":"problems"
+                },
+                {
+                    "system":"http://smarthealthit.org/security/users",
+                    "code":"Patient/smart-1032702"
+                }
+            ]
+        },
+        "text":{
+            "status":"generated",
+            "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\">Abnormal weight loss</div>"
+        },
+        "patient":{
+            "reference":"Patient/smart-1032702"
+        },
+        "code":{
+            "coding":[
+                {
+                    "system":"http://snomed.info/sct",
+                    "code":"267024001",
+                    "display":"Abnormal weight loss"
+                }
+            ],
+            "text":"Abnormal weight loss"
+        },
+        "clinicalStatus":"active",
+        "verificationStatus":"confirmed",
+        "onsetDateTime":"2007-12-19"
+    },
+    "search":{
+        "mode":"match"
+    }
+}

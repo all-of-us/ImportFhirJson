@@ -41,3 +41,17 @@ def fixEntity(conn,entity):
                             return entity,False
                 return entity,True
         return entity,True
+    if(resourceType=="Condition"):
+        if(entity.get('patient')!=None):
+            reference=entity.get('patient').get('reference').split('/')
+            referenceType=reference[0]
+            referenceID=reference[1]
+            c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+            result=c.fetchone()
+            if(result):
+                referenceID=result[2]
+                entity['patient']['reference']="{}/{}".format(referenceType,referenceID)
+            else:
+                return entity,False
+
+        return entity,True

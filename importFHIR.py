@@ -35,8 +35,8 @@ def mappingExists(conn,entity):
         
 
 def postEntity(entity,args):
-    if(entity.get('resourceType')!="Medication"):
-        return "tempnewID",True
+    # if(entity.get('resourceType')!="Medication"):
+    #     return "tempnewID",True
     entity.pop('id')
     entity.pop('meta',None)
     response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'),json=entity)
@@ -65,10 +65,10 @@ def processFile(conn,entity,args):
         successful=False
     if(not successful):
         return False
+    oldID=entity.get('id')
     newID,successful=postEntity(entity,args)
     if(not successful):
         return False
-    oldID=entity.get('id')
     resourceType=entity.get('resourceType')
     c=conn.cursor()
     c.execute("INSERT INTO IDMap VALUES('{}','{}','{}');".format(oldID,resourceType,newID))
