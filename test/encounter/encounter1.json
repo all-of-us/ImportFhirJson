@@ -1,0 +1,27 @@
+{
+    "fullUrl":"http://api:8080/baseDstu2/Encounter/smart-encounter-698",
+    "resource":{
+        "resourceType":"Encounter",
+        "id":"smart-encounter-698",
+        "meta":{
+            "versionId":"9",
+            "lastUpdated":"2019-08-14T19:32:12.616+00:00"
+        },
+        "text":{
+            "status":"generated",
+            "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\">2007-08-15: ambulatory encounter</div>"
+        },
+        "status":"finished",
+        "class":"ambulatory",
+        "patient":{
+            "reference":"Patient/smart-1186747"
+        },
+        "period":{
+            "start":"2007-08-15",
+            "end":"2007-08-15"
+        }
+    },
+    "search":{
+        "mode":"match"
+    }
+}

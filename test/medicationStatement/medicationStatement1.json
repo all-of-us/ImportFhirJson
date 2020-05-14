@@ -1,0 +1,30 @@
+{
+  "resourceType": "MedicationStatement",
+  "id": "19",
+  "patient": {
+    "reference": "Patient/leia-id",
+    "display": "Organa, Leia"
+  },
+  "status": "active",
+  "wasNotTaken": false,
+  "effectivePeriod": {
+    "start": "2010-08-04T00:00:00+00:00",
+    "end": "2010-10-13T00:00:00+00:00"
+  },
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "6876",
+        "display": "Methyldopa"
+      }
+    ]
+  },
+  "dosage": [
+    {
+      "quantityQuantity": {
+        "value": 60.0
+      }
+    }
+  ]
+}

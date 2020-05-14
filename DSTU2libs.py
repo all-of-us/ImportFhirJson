@@ -97,4 +97,9 @@ def fixEntity(conn,entity):
                 entity['patient']['reference']="{}/{}".format(referenceType,referenceID)
             else:
                 return entity,False
+    if(resourceType=="Practitioner"):
+        if(entity.get('practitionerRole'!=None)):
+            print("need to implement")
+        if(entity.get('qualification'!=None)):
+            print("need to convert qualification")
     return entity,True

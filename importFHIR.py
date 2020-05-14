@@ -101,6 +101,9 @@ def buildEntityList(fileList):
         if(tempString.get('resourceType',None)=="Medication"):
             print("we don't handle medications, skipping file {}".format(file))
             continue
+        if(tempString.get('resourceType',None)=="Procedure"):
+            print("temporarily skipping file {}".format(file))
+            continue
         if(tempString.get('resourceType',None)=="Bundle"):
             i=0
             for entity in tempString.get('entry'):

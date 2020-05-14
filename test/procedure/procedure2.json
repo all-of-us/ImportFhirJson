@@ -1,0 +1,36 @@
+{
+    "resourceType":"Procedure",
+    "id":"smart-procedure-25",
+    "meta":{
+        "versionId":"9",
+        "lastUpdated":"2019-08-14T19:33:01.380+00:00",
+        "security":[
+            {
+                "system":"http://smarthealthit.org/security/users",
+                "code":"Patient/smart-1288992"
+            },
+            {
+                "system":"http://smarthealthit.org/security/categories",
+                "code":"procedures"
+            }
+        ]
+    },
+    "text":{
+        "status":"generated",
+        "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\">Smoking cessation assistance</div>"
+    },
+    "subject":{
+        "reference":"Patient/smart-1288992"
+    },
+    "code":{
+        "coding":[
+            {
+                "system":"http://snomed.info/sct",
+                "code":"384742004",
+                "display":"Smoking cessation assistance"
+            }
+        ],
+        "text":"Smoking cessation assistance"
+    },
+    "performedDateTime":"2000-02-12"
+}

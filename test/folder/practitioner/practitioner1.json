@@ -1,0 +1,27 @@
+{
+    "resourceType":"Practitioner",
+    "id":"smart-practitioner-1234",
+    "meta":{
+        "versionId":"9",
+        "lastUpdated":"2019-08-14T19:33:01.380+00:00",
+        "security":[
+            {
+                "system":"http://smarthealthit.org/security/category",
+                "code":"public"
+            }
+        ]
+    },
+    "text":{
+        "status":"generated",
+        "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\">Practitioner: John Smith</div>"
+    },
+    "name":{
+        "use":"usual",
+        "family":[
+            "Smith"
+        ],
+        "given":[
+            "John"
+        ]
+    }
+}

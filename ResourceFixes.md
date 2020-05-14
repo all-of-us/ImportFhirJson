@@ -36,3 +36,8 @@ can have a `reasonForUse` field with a `reasonForUseReference` field that needs 
 can have a `suppotingInformation` with a `reference` field that needs adjusted (can be multiple supportingInformation)
 has a `medication` field, which may have a medicationReference that needs adjusted
 may have a `dosage` field, that may have a `site` field which may have a `siteReference` field that needs adjusted
+
+## Practicioner
+can have a `practitionerRole` field which may have a `managingOrganization` field, `location` field, `healthcareService` field that all need adjusted
+can have a `qualification` field which may have an `issuer` field that needs adjusted
+	had to check if identifier is null in addition to empty.. This fix needs applied to STU3 as well
