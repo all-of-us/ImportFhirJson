@@ -140,11 +140,11 @@ if __name__ == "__main__":
     parser.add_argument('--clean',help='will go over all mapping objects in the provided database, and remove them from the provided server',action='store_true')
     args=parser.parse_args()
 
-    fileList=getFileList(args.folder)
     conn=sqlite3.connect(args.database_name)
     if(args.clean):
         cleanUp(conn,args)
         exit()
+    fileList=getFileList(args.folder)
     DBSetup(conn)
     print(len(fileList))
     # print(fileList)

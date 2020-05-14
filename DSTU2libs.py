@@ -55,3 +55,40 @@ def fixEntity(conn,entity):
                 return entity,False
 
         return entity,True
+    if(resourceType=="Encounter"):
+        if(entity.get('patient')!=None):
+            reference=entity.get('patient').get('reference').split('/')
+            referenceType=reference[0]
+            referenceID=reference[1]
+            c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+            result=c.fetchone()
+            if(result):
+                referenceID=result[2]
+                entity['patient']['reference']="{}/{}".format(referenceType,referenceID)
+            else:
+                return entity,False
+        if(entity.get('indication')!=None):
+            for indication in entity.get('indication'):
+                reference=indication.get('reference').split('/')
+                referenceType=reference[0]
+                referenceID=reference[1]
+                c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+                result=c.fetchone()
+                if(result):
+                    referenceID=result[2]
+                    indication['reference']="{}/{}".format(referenceType,referenceID)
+                else:
+                    return entity,False
+        return entity,True
+    if(resourceType=="Procedure"):
+        reference=entity.get('subject').get('reference').split('/')
+        referenceType=reference[0]
+        referenceID=reference[1]
+        c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+        result=c.fetchone()
+        if(result):
+            referenceID=result[2]
+            entity['subject']['reference']="{}/{}".format(referenceType,referenceID)
+            return entity,True
+        else:
+            return entity,False
