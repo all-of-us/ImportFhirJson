@@ -10,7 +10,7 @@ def fixEntity(conn,entity):
     c=conn.cursor()
     resourceType=entity.get('resourceType')
     if(resourceType=="Patient"):
-        return entity,True
+        pass
     if(resourceType=="Observation"):
         reference=entity.get('subject').get('reference').split('/')
         referenceType=reference[0]
@@ -20,7 +20,6 @@ def fixEntity(conn,entity):
         if(result):
             referenceID=result[2]
             entity['subject']['reference']="{}/{}".format(referenceType,referenceID)
-            return entity,True
         else:
             return entity,False
     if(resourceType=="Medication"):
@@ -39,8 +38,6 @@ def fixEntity(conn,entity):
                             ingredient['item']['reference']="{}/{}".format(referenceType,referenceID)
                         else:
                             return entity,False
-                return entity,True
-        return entity,True
     if(resourceType=="Condition"):
         if(entity.get('patient')!=None):
             reference=entity.get('patient').get('reference').split('/')
@@ -53,8 +50,6 @@ def fixEntity(conn,entity):
                 entity['patient']['reference']="{}/{}".format(referenceType,referenceID)
             else:
                 return entity,False
-
-        return entity,True
     if(resourceType=="Encounter"):
         if(entity.get('patient')!=None):
             reference=entity.get('patient').get('reference').split('/')
@@ -79,7 +74,6 @@ def fixEntity(conn,entity):
                     indication['reference']="{}/{}".format(referenceType,referenceID)
                 else:
                     return entity,False
-        return entity,True
     if(resourceType=="Procedure"):
         reference=entity.get('subject').get('reference').split('/')
         referenceType=reference[0]
@@ -89,6 +83,18 @@ def fixEntity(conn,entity):
         if(result):
             referenceID=result[2]
             entity['subject']['reference']="{}/{}".format(referenceType,referenceID)
-            return entity,True
         else:
             return entity,False
+    if(resourceType=="MedicationStatement"):
+        if(entity.get('patient')!=None):
+            reference=entity.get('patient').get('reference').split('/')
+            referenceType=reference[0]
+            referenceID=reference[1]
+            c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+            result=c.fetchone()
+            if(result):
+                referenceID=result[2]
+                entity['patient']['reference']="{}/{}".format(referenceType,referenceID)
+            else:
+                return entity,False
+    return entity,True

@@ -28,3 +28,11 @@ can have a `used` field, with a `reference` field that needs adjusted
 ## Encounter
 has `patient` field, with a `reference` field that needs adjusted
 has an `indication` field, with multiple `reference` fields that need adjusted (these link to Conditions)
+
+## MedicationStatement
+has a `patient` field, with a `reference` field that needs adjusted
+can have an `informationSource` field with a `reference` field that needs adjusted
+can have a `reasonForUse` field with a `reasonForUseReference` field that needs adjusted
+can have a `suppotingInformation` with a `reference` field that needs adjusted (can be multiple supportingInformation)
+has a `medication` field, which may have a medicationReference that needs adjusted
+may have a `dosage` field, that may have a `site` field which may have a `siteReference` field that needs adjusted
