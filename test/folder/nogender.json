@@ -1,30 +1,71 @@
 {
-  "resourceType": "Patient",
-  "id": "leia-id2",
-  "meta": {
-    "profile": [
-      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
-    ]
-  },
-  "text": {
-    "status": "generated",
-    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><div class=\"hapiHeaderText\">Leia <b>ORGANA </b></div><table class=\"hapiPropertyTable\"><tbody><tr><td>Identifier</td><td>44737828</td></tr><tr><td>Date of birth</td><td><span>01 January 1980</span></td></tr></tbody></table></div>"
-  },
-  "identifier": [
-    {
-      "value": "44737828"
-    }
-  ],
-  "active": true,
-  "name": [
-    {
-      "family": [
-        "Organa"
-      ],
-      "given": [
-        "Leia"
+  "resourceType":"Patient",
+  "id":"smart-1272431",
+  "meta":{
+      "versionId":"9",
+      "lastUpdated":"2019-08-14T19:32:37.986+00:00",
+      "security":[
+          {
+              "system":"http://smarthealthit.org/security/users",
+              "code":"Patient/smart-1272431"
+          },
+          {
+              "system":"http://smarthealthit.org/security/categories",
+              "code":"patient"
+          }
       ]
-    }
+  },
+  "text":{
+      "status":"generated",
+      "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\">        <p>Stephan Graham</p>      </div>"
+  },
+  "identifier":[
+      {
+          "use":"usual",
+          "type":{
+              "coding":[
+                  {
+                      "system":"http://hl7.org/fhir/v2/0203",
+                      "code":"MR",
+                      "display":"Medical record number"
+                  }
+              ],
+              "text":"Medical record number"
+          },
+          "system":"http://hospital.smarthealthit.org",
+          "value":"1272431"
+      }
   ],
-  "birthDate": "1980-01-01"
+  "active":true,
+  "name":[
+      {
+          "use":"official",
+          "family":[
+              "Graham"
+          ],
+          "given":[
+              "Stephan",
+              "P."
+          ]
+      }
+  ],
+  "telecom":[
+      {
+          "system":"email",
+          "value":"stephan.graham@example.com"
+      }
+  ],
+  "birthDate":"1945-05-01",
+  "address":[
+      {
+          "use":"home",
+          "line":[
+              "27 Park RdApt 17"
+          ],
+          "city":"Mounds",
+          "state":"OK",
+          "postalCode":"74047",
+          "country":"USA"
+      }
+  ]
 }

@@ -40,5 +40,3 @@ may have a `dosage` field, that may have a `site` field which may have a `siteRe
 ## Practicioner
 can have a `practitionerRole` field which may have a `managingOrganization` field, `location` field, `healthcareService` field that all need adjusted
 can have a `qualification` field which may have an `issuer` field that needs adjusted
-	had to check if identifier is null in addition to empty.. This fix needs applied to STU3 as well
-	have to check if gender is provided. This fix neesd applied to STU3 as well
