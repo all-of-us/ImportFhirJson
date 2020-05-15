@@ -36,7 +36,7 @@ def mappingExists(conn,entity):
 
 def postEntity(entity,args):
     # if(entity.get('resourceType')!="Medication"):
-    #     return "tempnewID",True
+    # return "tempnewID",True
     entity.pop('id')
     entity.pop('meta',None)
     response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'),json=entity)
@@ -46,12 +46,12 @@ def postEntity(entity,args):
         print(response.status_code)
         print(response.text)
         # there must have been an error
-        return "",False
+        return "","notSuccess"
     print(response.status_code)
     newLocation=response.headers.get('Location').split("/")
     print(newLocation)
     newID=newLocation[len(newLocation)-1]
-    return newID,True
+    return newID,"success"
 
 def processFile(conn,entity,args):
     # This is where I'm going to want to put all of the code to determine what version to be working with
@@ -63,17 +63,17 @@ def processFile(conn,entity,args):
     else:
         print("running for R4")
         successful=False
-    if(not successful):
-        return False
+    if(successful!="success"):
+        return successful
     oldID=entity.get('id')
     newID,successful=postEntity(entity,args)
-    if(not successful):
-        return False
+    if(successful!="success"):
+        return successful
     resourceType=entity.get('resourceType')
     c=conn.cursor()
     c.execute("INSERT INTO IDMap VALUES('{}','{}','{}');".format(oldID,resourceType,newID))
     conn.commit()
-    return True
+    return successful
 
 def cleanUp(conn,args):
     c=conn.cursor()
@@ -98,18 +98,18 @@ def buildEntityList(fileList):
             except json.JSONDecodeError:
                 print("file {} is invalid json".format(file))
                 continue
-        if(tempString.get('resourceType',None)=="Medication"):
-            print("we don't handle medications, skipping file {}".format(file))
-            continue
+        # if(tempString.get('resourceType',None)=="Medication"):
+        #     print("we don't handle medications, skipping file {}".format(file))
+        #     continue
         if(tempString.get('resourceType',None)=="Procedure"):
             print("temporarily skipping file {}".format(file))
             continue
         if(tempString.get('resourceType',None)=="Bundle"):
             i=0
             for entity in tempString.get('entry'):
-                if(entity.get('resourceType',None)=="Medication"):
-                    print("we don't handle medications, skipping file {} entity:{}".format(file,i))
-                    continue
+                # if(entity.get('resourceType',None)=="Medication"):
+                #     print("we don't handle medications, skipping file {} entity:{}".format(file,i))
+                #     continue
                 tempDict={}
                 tempDict['file']=file
                 tempDict['type']=3
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     iteration=0
     addedEntities=[]
     skippedEntities=[]
-    
+    errorEntities=[]
     entityList=buildEntityList(fileList)
     # print(entityList)
     while entityList:
@@ -179,15 +179,20 @@ if __name__ == "__main__":
             # This entity already exists
             skippedEntities.append(fileEntity)
             entityList.pop(0)
-            iteration=0
+            # iteration=0
             # print("popping entity, ",entity)
             continue
         else:
-            if(processFile(conn,entity,args)):
+            result=processFile(conn,entity,args)
+            if(result=="success"):
                 # we successfully processed the file
                 addedEntities.append(fileEntity)
                 entityList.pop(0)
                 iteration=0
+            elif(result=="removeFile"):
+                print("removing: ",fileEntity)
+                errorEntities.append(fileEntity)
+                entityList.pop(0)
             else:
                 # we failed importing
                 entityList.append(fileEntity)
@@ -195,6 +200,7 @@ if __name__ == "__main__":
                 iteration=iteration+1
                 continue
         
-    print("entities not imported: ",entityList)
-    print(addedEntities)
-    print("files skipped as they're already imported: ",skippedEntities)
+    print("entities not imported: ",entityList,"\n")
+    print("entities imported: ",addedEntities,"\n")
+    print("files skipped as they're already imported: ",skippedEntities,"\n")
+    print("entities skipped due to errors: ",errorEntities)

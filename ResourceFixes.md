@@ -5,6 +5,11 @@ I consider this a base class as it doesn't depend on anything before it.
 
 ## Observation
 has a `Subject` Field, with a `Reference` field that will need adjusted
+can have an `encounter` field, with a `reference` field that needs adjusted
+can have a `performer` field, with a `actor` reference that needs adjusted (can be multiple performers)
+can have a `specimin` field, with a `reference` field that needs adjusted
+can have a `device` field, with a `reference` field that needs adjusted
+can have a `related` field, which may have a `targed` field that needs adjusted
 in OMOP, the measurement_date is required, in FHIR it is not. we will have issues importing if it is not in existence
 
 ## Medication
@@ -40,3 +45,14 @@ may have a `dosage` field, that may have a `site` field which may have a `siteRe
 ## Practicioner
 can have a `practitionerRole` field which may have a `managingOrganization` field, `location` field, `healthcareService` field that all need adjusted
 can have a `qualification` field which may have an `issuer` field that needs adjusted
+
+## MedicationOrder
+can have a `patient` field, with a `reference` field that needs adjusted
+can have a `perscriber` field, with a `reference` field that needs adjusted
+can have an `encounter` field, with a `reference` field that needs adjusted
+can have a `reason` field with a `reasonReference` field that needs adjusted
+has a `medication` field, which may have a medicationReference that needs adjusted
+may have a `dosage` field, that may have a `site` field which may have a `siteReference` field that needs adjusted
+may have a `dispenseRequest` field, that may have a `medication` field, which may have a medicationReference that needs adjusted
+may have a `priorPrescription` field, with a `reference` field that needs adjusted
+in OMOP, the drug_exposure_start_date is required, in FHIR it is not. we will have issues importing if it is not in existance. 

@@ -1,0 +1,72 @@
+{
+    "resourceType":"MedicationOrder",
+    "id":"smart-medicationorder-101",
+    "meta":{
+        "versionId":"9",
+        "lastUpdated":"2019-08-14T19:31:57.509+00:00",
+        "security":[
+            {
+                "system":"http://smarthealthit.org/security/categories",
+                "code":"medications"
+            },
+            {
+                "system":"http://smarthealthit.org/security/users",
+                "code":"Patient/smart-1032702"
+            }
+        ]
+    },
+    "text":{
+        "status":"generated",
+        "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\">      Nizatidine 15 MG/ML Oral Solution [Axid] (rxnorm: 582620)    </div>"
+    },
+    "status":"active",
+    "patient":{
+        "reference":"Patient/smart-1032702"
+    },
+    "medicationCodeableConcept":{
+        "coding":[
+            {
+                "system":"http://www.nlm.nih.gov/research/umls/rxnorm",
+                "code":"582620",
+                "display":"Nizatidine 15 MG/ML Oral Solution [Axid]"
+            }
+        ],
+        "text":"Nizatidine 15 MG/ML Oral Solution [Axid]"
+    },
+    "dosageInstruction":[
+        {
+            "text":"10 mL bid",
+            "timing":{
+                "repeat":{
+                    "boundsPeriod":{
+                        "start":"2008-04-05"
+                    },
+                    "frequency":2,
+                    "period":1,
+                    "periodUnits":"d"
+                }
+            },
+            "doseQuantity":{
+                "value":10,
+                "unit":"mL",
+                "system":"http://unitsofmeasure.org",
+                "code":"mL"
+            }
+        }
+    ],
+    "dispenseRequest":{
+        "numberOfRepeatsAllowed":1,
+        "quantity":{
+            "value":1,
+            "unit":"mL",
+            "system":"http://unitsofmeasure.org",
+            "code":"mL"
+        },
+        "expectedSupplyDuration":{
+            "value":30,
+            "unit":"days",
+            "system":"http://unitsofmeasure.org",
+            "code":"d"
+        }
+    }
+}
