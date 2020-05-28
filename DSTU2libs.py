@@ -121,5 +121,40 @@ def fixEntity(conn,entity):
                 entity['patient']['reference']="{}/{}".format(referenceType,referenceID)
             else:
                 successful="notSuccess"
-    print(successful)
+    elif(resourceType=="Device"):
+        print("we don't allow posting of Devices currently")
+        successful="removeFile"
+        # if(entity.get('patient')!=None):
+        #     reference=entity.get('patient').get('reference').split('/')
+        #     referenceType=reference[0]
+        #     referenceID=reference[1]
+        #     c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+        #     result=c.fetchone()
+        #     if(result):
+        #         referenceID=result[2]
+        #         entity['patient']['reference']="{}/{}".format(referenceType,referenceID)
+        #     else:
+        #         successful="notSuccess"
+        # if(entity.get('owner')!=None):
+        #     print("need to implement owner in Device")
+        #     successful="removeFile"
+        #     pass
+        # if(entity.get('location')!=None):
+        #     print("need to implement location in Device")
+        #     successful="removeFile"
+        #     pass
+    elif(resourceType=="DeviceUseStatement"):
+        print("we don't allow posting of DeviceUseStatement currently")
+        successful="removeFile"
+        pass
+        # reference=entity.get('subject').get('reference').split('/')
+        # referenceType=reference[0]
+        # referenceID=reference[1]
+        # c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+        # result=c.fetchone()
+        # if(result):
+        #     referenceID=result[2]
+        #     entity['subject']['reference']="{}/{}".format(referenceType,referenceID)
+        # else:
+        #     successful="notSuccess"
     return entity,successful

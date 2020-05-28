@@ -56,3 +56,22 @@ may have a `dosage` field, that may have a `site` field which may have a `siteRe
 may have a `dispenseRequest` field, that may have a `medication` field, which may have a medicationReference that needs adjusted
 may have a `priorPrescription` field, with a `reference` field that needs adjusted
 in OMOP, the drug_exposure_start_date is required, in FHIR it is not. we will have issues importing if it is not in existance. 
+
+## Device
+can have an `owner` field, with a `reference` field that needs adjusted
+can have an `location` field, with a `reference` field that needs adjusted
+can have an `patient` field, with a `reference` field that needs adjusted
+
+## DeviceUseStatement
+can have a `bodySite` field, with a `bodySiteReference` field that needs adjusted
+can have a `device` field, with a `reference` field that needs adjusted
+has a `subject` field, with a `reference` field that needs adjusted
+
+## DocumentReference
+can have a `subject` field, with a `reference` field that needs adjusted
+can have an `author` field, with a `reference` field that needs adjusted (can be multiple authors)
+can have a `authenticator` field, with a `reference` field that needs adjusted
+can have a `relatesTo` field, with a `target` field with a `reference` field that needs adjusted
+can have a `context` field, with a `encounter` field with a `reference` field that needs adjusted
+can have a `context` field, with a `sourcePatientInfo` field with a `reference` field that needs adjusted
+can have a `context` field, with a `related` field with a `ref` field with a `reference` field that needs adjusted (may be multiple related)
