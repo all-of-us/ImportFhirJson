@@ -62,6 +62,8 @@ can have an `owner` field, with a `reference` field that needs adjusted
 can have an `location` field, with a `reference` field that needs adjusted
 can have an `patient` field, with a `reference` field that needs adjusted
 
+note- we don't allow posting of Device directly, you must use DeviceUseStatment
+
 ## DeviceUseStatement
 can have a `bodySite` field, with a `bodySiteReference` field that needs adjusted
 can have a `device` field, with a `reference` field that needs adjusted
