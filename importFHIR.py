@@ -1,4 +1,4 @@
-import json, requests, sqlite3, os, argparse, itertools
+import json, requests, sqlite3, os, argparse, itertools, getpass
 from DSTU2libs import *
 
 defaultServer="https://apps.hdap.gatech.edu/omoponfhir2/fhir/"
@@ -6,6 +6,7 @@ defaultFolder="/home/bcrumpton3-gtri/Documents/AllOfUs/ImportFhirJson/test"
 authTypes=["basic","SSO"]
 fhirVersions=["DSTU2","STU3","R4"]
 defaultDB="OmopMapping.db"
+globalAuth=None
 
 def getFileList(path):
     jsonFiles=[]
@@ -35,11 +36,13 @@ def mappingExists(conn,entity):
         
 
 def postEntity(entity,args):
+    global globalAuth
     # if(entity.get('resourceType')!="Medication"):
     # return "tempnewID",True
     entity.pop('id')
     entity.pop('meta',None)
-    response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'),json=entity)
+    print(globalAuth)
+    response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=globalAuth,json=entity)
     if(response.status_code!=201):
         # Error code 500 is a backend error, or an import error
         print(entity)
@@ -83,8 +86,9 @@ def cleanUp(conn,args):
         deleteFromServer(row,args)
 
 def deleteFromServer(row,args):
+    global globalAuth
     print(row)
-    response = requests.delete("{}{}/{}".format(args.server,row[1],row[2]),auth=requests.auth.HTTPBasicAuth('***REMOVED***','***REMOVED***'))
+    response = requests.delete("{}{}/{}".format(args.server,row[1],row[2]),auth=globalAuth)
     print(response.status_code)
     # 204 is successful deletion
     print(response.text)
@@ -137,11 +141,16 @@ if __name__ == "__main__":
         """.format(defaultServer,defaultFolder))
     parser.add_argument("-s","--server",type=str,default=defaultServer,help="Omop Server URL to import data")
     parser.add_argument("-f","--folder",type=str,default=defaultFolder,help="folder location with all JSON files. This can have sub folders")
-    parser.add_argument("--auth-type",type=str,choices=authTypes,help="what type of authentication the server utilizes")
+    parser.add_argument("--auth-type",type=str,choices=authTypes,default="basic",help="what type of authentication the server utilizes")
     parser.add_argument("--fhirversion",type=str,choices=fhirVersions,default="DSTU2",help="what FHIR version are the JSON files stored in")
     parser.add_argument("-d","--database-name",type=str,default=defaultDB,help="sqlite file name that will hold the ID mapping results")
     parser.add_argument('--clean',help='will go over all mapping objects in the provided database, and remove them from the provided server',action='store_true')
     args=parser.parse_args()
+
+    if(args.auth_type=='basic'):
+        username=getpass.getpass("Username: ")
+        password=getpass.getpass()
+        globalAuth=requests.auth.HTTPBasicAuth(username,password)
 
     conn=sqlite3.connect(args.database_name)
     if(args.clean):
