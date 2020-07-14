@@ -41,7 +41,6 @@ def postEntity(entity,args):
     # return "tempnewID",True
     entity.pop('id')
     entity.pop('meta',None)
-    print(globalAuth)
     response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=globalAuth,json=entity)
     if(response.status_code!=201):
         # Error code 500 is a backend error, or an import error
@@ -105,9 +104,9 @@ def buildEntityList(fileList):
         # if(tempString.get('resourceType',None)=="Medication"):
         #     print("we don't handle medications, skipping file {}".format(file))
         #     continue
-        if(tempString.get('resourceType',None)=="Procedure"):
-            print("temporarily skipping file {}".format(file))
-            continue
+        # if(tempString.get('resourceType',None)=="Procedure"):
+        #     print("temporarily skipping file {}".format(file))
+        #     continue
         if(tempString.get('resourceType',None)=="Bundle"):
             i=0
             for entity in tempString.get('entry'):
@@ -140,6 +139,7 @@ if __name__ == "__main__":
         This will go through all files in the specified folder ({} by default), and import them to the omoponfhir server provided ({} by default)
         """.format(defaultServer,defaultFolder))
     parser.add_argument("-s","--server",type=str,default=defaultServer,help="Omop Server URL to import data")
+    parser.add_argument("--originalserver",type=str,default=defaultServer,help="URL of original server where ingested data came from. Necessary for pulling down documents")
     parser.add_argument("-f","--folder",type=str,default=defaultFolder,help="folder location with all JSON files. This can have sub folders")
     parser.add_argument("--auth-type",type=str,choices=authTypes,default="basic",help="what type of authentication the server utilizes")
     parser.add_argument("--fhirversion",type=str,choices=fhirVersions,default="DSTU2",help="what FHIR version are the JSON files stored in")

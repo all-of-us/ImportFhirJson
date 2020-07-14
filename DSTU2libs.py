@@ -1,10 +1,10 @@
 import json, requests, sqlite3, os, argparse, itertools
 
 def DSTU2fixEntity(conn,entity,args):
-    entity,successful=fixEntity(conn,entity)
+    entity,successful=fixEntity(conn,entity,args)
     return entity,successful
 
-def fixEntity(conn,entity):
+def fixEntity(conn,entity,args):
     c=conn.cursor()
     resourceType=entity.get('resourceType')
     successful="success"
@@ -78,6 +78,10 @@ def fixEntity(conn,entity):
                     successful="notSuccess"
                     break
     elif(resourceType=="Procedure"):
+        if(entity.get('performedDateTime')==None):
+            print("Cannot import this file, needs performedDateTime")
+            successful="removeFile"
+            pass
         reference=entity.get('subject').get('reference').split('/')
         referenceType=reference[0]
         referenceID=reference[1]
@@ -110,6 +114,8 @@ def fixEntity(conn,entity):
             print("Cannot import this file, needs dateWritten")
             successful="removeFile"
             pass
+        if(entity.get('dateEnded')==None):
+            entity['dateEnded']=entity.get('dateWritten')
         if(entity.get('patient')!=None):
             reference=entity.get('patient').get('reference').split('/')
             referenceType=reference[0]
@@ -157,4 +163,45 @@ def fixEntity(conn,entity):
         #     entity['subject']['reference']="{}/{}".format(referenceType,referenceID)
         # else:
         #     successful="notSuccess"
+    elif(resourceType=="DocumentReference"):
+        if(entity.get('subject')!=None):
+            reference=entity.get('subject').get('reference').split('/')
+            referenceType=reference[0]
+            referenceID=reference[1]
+            c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+            result=c.fetchone()
+            if(result):
+                referenceID=result[2]
+                entity['subject']['reference']="{}/{}".format(referenceType,referenceID)
+            else:
+                successful="notSuccess"
+        if(entity.get('author')!=None):
+            for author in entity.get('author'):
+                reference=author.get('reference').split('/')
+                referenceType=reference[0]
+                referenceID=reference[1]
+                c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+                result=c.fetchone()
+                if(result):
+                    referenceID=result[2]
+                    author['reference']="{}/{}".format(referenceType,referenceID)
+                else:
+                    successful="notSuccess"
+                    break
+        if(entity.get('content')!=None):
+            for content in entity.get('content'):
+                if(content.get('attachment')!=None):
+                    if(content['attachment'].get('contentType')=='application/pdf'):
+                        print("{}{}".format(args.originalserver,content['attachment'].get('url')))
+                        response=requests.get("{}{}".format(args.originalserver,content['attachment'].get('url')))
+                        filename=content['attachment'].get('url').split("/")
+                        print(filename)
+                        with open(filename[2], 'wb') as f:
+                            f.write(response.content)
+
+
+    else:
+        print("we don't know how to handle {} files yet".format(resourceType))
+        successful="removeFile"
+        pass
     return entity,successful
