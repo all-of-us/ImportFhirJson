@@ -39,7 +39,7 @@ def postEntity(entity,args):
     global globalAuth
     # if(entity.get('resourceType')!="Medication"):
     # return "tempnewID",True
-    entity.pop('id')
+    entity.pop('id',None)
     entity.pop('meta',None)
     response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=globalAuth,json=entity)
     if(response.status_code!=201):
@@ -104,7 +104,7 @@ def buildEntityList(fileList):
         # if(tempString.get('resourceType',None)=="Medication"):
         #     print("we don't handle medications, skipping file {}".format(file))
         #     continue
-        # if(tempString.get('resourceType',None)=="Procedure"):
+        # if(tempString.get('resourceType',None)=="DeviceUseStatement"):
         #     print("temporarily skipping file {}".format(file))
         #     continue
         if(tempString.get('resourceType',None)=="Bundle"):

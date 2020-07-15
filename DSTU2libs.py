@@ -150,19 +150,17 @@ def fixEntity(conn,entity,args):
         #     successful="removeFile"
         #     pass
     elif(resourceType=="DeviceUseStatement"):
-        print("we don't allow posting of DeviceUseStatement currently")
-        successful="removeFile"
-        pass
-        # reference=entity.get('subject').get('reference').split('/')
-        # referenceType=reference[0]
-        # referenceID=reference[1]
-        # c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
-        # result=c.fetchone()
-        # if(result):
-        #     referenceID=result[2]
-        #     entity['subject']['reference']="{}/{}".format(referenceType,referenceID)
-        # else:
-        #     successful="notSuccess"
+        reference=entity.get('subject').get('reference').split('/')
+        referenceType=reference[0]
+        referenceID=reference[1]
+        c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+        result=c.fetchone()
+        if(result):
+            referenceID=result[2]
+            entity['subject']['reference']="{}/{}".format(referenceType,referenceID)
+            entity['contained'][0]['patient']['reference']="{}/{}".format(referenceType,referenceID)
+        else:
+            successful="notSuccess"
     elif(resourceType=="DocumentReference"):
         if(entity.get('subject')!=None):
             reference=entity.get('subject').get('reference').split('/')
@@ -189,6 +187,7 @@ def fixEntity(conn,entity,args):
                     successful="notSuccess"
                     break
         if(entity.get('content')!=None):
+            # TODO: We can convert any files to base64 and properly submit it. Just need to set the base64 to the attachment.data field
             for content in entity.get('content'):
                 if(content.get('attachment')!=None):
                     if(content['attachment'].get('contentType')=='application/pdf'):
@@ -199,7 +198,18 @@ def fixEntity(conn,entity,args):
                         with open(filename[2], 'wb') as f:
                             f.write(response.content)
 
-
+    elif(resourceType=="Organization"):
+        if(entity.get('partOf')!=None):
+            reference=entity.get('partOf').get('reference').split('/')
+            referenceType=reference[0]
+            referenceID=reference[1]
+            c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+            result=c.fetchone()
+            if(result):
+                referenceID=result[2]
+                entity['partOf']['reference']="{}/{}".format(referenceType,referenceID)
+            else:
+                successful="notSuccess"
     else:
         print("we don't know how to handle {} files yet".format(resourceType))
         successful="removeFile"

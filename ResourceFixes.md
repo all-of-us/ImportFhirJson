@@ -77,3 +77,6 @@ can have a `relatesTo` field, with a `target` field with a `reference` field tha
 can have a `context` field, with a `encounter` field with a `reference` field that needs adjusted
 can have a `context` field, with a `sourcePatientInfo` field with a `reference` field that needs adjusted
 can have a `context` field, with a `related` field with a `ref` field with a `reference` field that needs adjusted (may be multiple related)
+
+## Organization
+can have a `partOf` field, with a `reference` field that needs adjusted
