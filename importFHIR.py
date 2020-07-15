@@ -13,7 +13,6 @@ def getFileList(path):
     for root, dirs, files in os.walk(path):
         for name in files:
             if name.endswith((".json")):
-                print(name)
                 full_path = os.path.join(root, name)
                 jsonFiles.append(full_path)
     return jsonFiles
@@ -44,9 +43,9 @@ def postEntity(entity,args):
     response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=globalAuth,json=entity)
     if(response.status_code!=201):
         # Error code 500 is a backend error, or an import error
-        print(entity)
-        print(response.status_code)
-        print(response.text)
+        # print(entity)
+        # print(response.status_code)
+        # print(response.text)
         # there must have been an error
         return "","notSuccess"
     print(response.status_code)
@@ -67,6 +66,7 @@ def processFile(conn,entity,args):
         successful=False
     if(successful!="success"):
         return successful
+    # TODO: in the event that we don't have an old ID, we should create something so that we don't have DB clashes
     oldID=entity.get('id')
     newID,successful=postEntity(entity,args)
     if(successful!="success"):
@@ -101,18 +101,9 @@ def buildEntityList(fileList):
             except json.JSONDecodeError:
                 print("file {} is invalid json".format(file))
                 continue
-        # if(tempString.get('resourceType',None)=="Medication"):
-        #     print("we don't handle medications, skipping file {}".format(file))
-        #     continue
-        # if(tempString.get('resourceType',None)=="DeviceUseStatement"):
-        #     print("temporarily skipping file {}".format(file))
-        #     continue
         if(tempString.get('resourceType',None)=="Bundle"):
             i=0
             for entity in tempString.get('entry'):
-                # if(entity.get('resourceType',None)=="Medication"):
-                #     print("we don't handle medications, skipping file {} entity:{}".format(file,i))
-                #     continue
                 tempDict={}
                 tempDict['file']=file
                 tempDict['type']=3
@@ -158,8 +149,6 @@ if __name__ == "__main__":
         exit()
     fileList=getFileList(args.folder)
     DBSetup(conn)
-    print(len(fileList))
-    # print(fileList)
     iteration=0
     addedEntities=[]
     skippedEntities=[]
@@ -170,13 +159,12 @@ if __name__ == "__main__":
         maxIterations=len(entityList)*2
         fileEntity=entityList[0]
         if(iteration>=maxIterations):
-            print("we have a problem file. ")
-            print("exiting")
+            print("All remaining files have unsuccessfully imported twice each.")
             break
-        print(fileEntity)
         with open(fileEntity['file'],'r') as f:
             tempString=json.load(f)
         if(fileEntity['type']==3):
+            # this comes from a bundle
             entity=tempString.get('entry')[fileEntity['index']].get('resource')
         elif(fileEntity['type']==1):
             # print("format one")
@@ -188,8 +176,6 @@ if __name__ == "__main__":
             # This entity already exists
             skippedEntities.append(fileEntity)
             entityList.pop(0)
-            # iteration=0
-            # print("popping entity, ",entity)
             continue
         else:
             result=processFile(conn,entity,args)
@@ -199,11 +185,12 @@ if __name__ == "__main__":
                 entityList.pop(0)
                 iteration=0
             elif(result=="removeFile"):
-                print("removing: ",fileEntity)
+                # this file cannot be processed at any time. remove it from the list
+                print(fileEntity['file'])
                 errorEntities.append(fileEntity)
                 entityList.pop(0)
             else:
-                # we failed importing
+                # we failed importing, add it back to the list and try again later
                 entityList.append(fileEntity)
                 entityList.pop(0)
                 iteration=iteration+1
