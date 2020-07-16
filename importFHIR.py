@@ -83,11 +83,9 @@ def cleanUp(conn,args):
 
 def deleteFromServer(row,args):
     global globalAuth
-    print(row)
     response = requests.delete("{}{}/{}".format(args.server,row[1],row[2]),auth=globalAuth)
-    print(response.status_code)
+    print("attempted removal of {}/{} gives status code: {} and text: {}".format(row[1],row[2],response.status_code,response.text))
     # 204 is successful deletion
-    print(response.text)
 
 def buildEntityList(fileList):
     entityList=[]
