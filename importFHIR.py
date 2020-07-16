@@ -170,6 +170,7 @@ if __name__ == "__main__":
             # print("format two")
             entity=tempString
         if(mappingExists(conn,entity)):
+            print("an entity of this Resource type with this ID has already been imported. skipping this file:{}".format(fileEntity))
             # This entity already exists
             skippedEntities.append(fileEntity)
             entityList.pop(0)

@@ -11,6 +11,10 @@ def fixEntity(conn,entity,args):
     if(resourceType=="Patient"):
         pass
     elif(resourceType=="Observation"):
+        if(entity.get('effectiveDateTime')==None):
+            print("Cannot import this file, needs effectiveDateTime")
+            successful="removeFile"
+            pass
         reference=entity.get('subject').get('reference').split('/')
         referenceType=reference[0]
         referenceID=reference[1]
