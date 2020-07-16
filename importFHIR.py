@@ -43,14 +43,11 @@ def postEntity(entity,args):
     response = requests.post("{}{}".format(args.server,entity.get('resourceType')),auth=globalAuth,json=entity)
     if(response.status_code!=201):
         # Error code 500 is a backend error, or an import error
-        # print(entity)
-        # print(response.status_code)
-        # print(response.text)
+        print("Entity: {} failed to post with status:{} and text:{}".format(entity,response.status_code,response.text))
         # there must have been an error
         return "","notSuccess"
-    print(response.status_code)
+    print("Response code:{} Resource URL:{}".format(response.status_code,response.headers.get('Location')))
     newLocation=response.headers.get('Location').split("/")
-    print(newLocation)
     newID=newLocation[len(newLocation)-1]
     return newID,"success"
 
@@ -159,6 +156,7 @@ if __name__ == "__main__":
     while entityList:
         maxIterations=len(entityList)*2
         fileEntity=entityList[0]
+        print("Checking {}".format(fileEntity))
         if(iteration>=maxIterations):
             print("All remaining files have unsuccessfully imported twice each.")
             break
