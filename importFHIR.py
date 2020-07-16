@@ -154,7 +154,7 @@ if __name__ == "__main__":
     while entityList:
         maxIterations=len(entityList)*2
         fileEntity=entityList[0]
-        print("Checking {}".format(fileEntity))
+        # print("Checking {}".format(fileEntity))
         if(iteration>=maxIterations):
             print("All remaining files have unsuccessfully imported twice each.")
             break
@@ -184,7 +184,7 @@ if __name__ == "__main__":
                 iteration=0
             elif(result=="removeFile"):
                 # this file cannot be processed at any time. remove it from the list
-                print(fileEntity['file'])
+                print("removing {} for the reason above".format(fileEntity['file']))
                 errorEntities.append(fileEntity)
                 entityList.pop(0)
             else:
