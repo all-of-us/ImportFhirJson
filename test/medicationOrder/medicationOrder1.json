@@ -54,7 +54,6 @@
             }
         }
     ],
-    "dateWritten":"2000-02-12",
     "dispenseRequest":{
         "numberOfRepeatsAllowed":1,
         "quantity":{
