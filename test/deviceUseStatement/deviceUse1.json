@@ -3,13 +3,15 @@
   "contained": [
     {
       "resourceType": "Device",
-      "udi":"W047017140055",
+      "id": "1",
+      "udi": {
+        "deviceIdentifier": "W047017140055"
+      },
       "type": {
         "coding": [
           {
-            "system": "urn:oid:2.16.840.1.113883.6.18",
-            "code": "E0316",
-            "display": "RED BLOOD CELLS|CPD>AS1/500mL/refg"
+            "system": "http://snomed.info/sct",
+            "code": "705288005"
           }
         ]
       },
@@ -25,6 +27,6 @@
     "start": "2177-10-18T00:00:00+00:00"
   },
   "device": {
-    "reference": "1"
+    "reference": "#1"
   }
 }
