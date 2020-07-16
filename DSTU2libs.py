@@ -150,6 +150,10 @@ def fixEntity(conn,entity,args):
         #     successful="removeFile"
         #     pass
     elif(resourceType=="DeviceUseStatement"):
+        if(entity.get('whenUsed')==None):
+            print("Cannot import this file, needs whenUsed")
+            successful="removeFile"
+            pass
         reference=entity.get('subject').get('reference').split('/')
         referenceType=reference[0]
         referenceID=reference[1]
@@ -186,18 +190,18 @@ def fixEntity(conn,entity,args):
                 else:
                     successful="notSuccess"
                     break
-        if(entity.get('content')!=None):
-            # TODO: We can convert any files to base64 and properly submit it. Just need to set the base64 to the attachment.data field
-            for content in entity.get('content'):
-                if(content.get('attachment')!=None):
-                    if(content['attachment'].get('contentType')=='application/pdf'):
-                        print("{}{}".format(args.originalserver,content['attachment'].get('url')))
-                        response=requests.get("{}{}".format(args.originalserver,content['attachment'].get('url')))
-                        filename=content['attachment'].get('url').split("/")
-                        print(filename)
-                        with open(filename[2], 'wb') as f:
-                            f.write(response.content)
-
+        if(args.pull_files):
+            if(entity.get('content')!=None):
+                # TODO: We can convert any files to base64 and properly submit it. Just need to set the base64 to the attachment.data field
+                for content in entity.get('content'):
+                    if(content.get('attachment')!=None):
+                        if(content['attachment'].get('contentType')=='application/pdf'):
+                            print("{}{}".format(args.originalserver,content['attachment'].get('url')))
+                            response=requests.get("{}{}".format(args.originalserver,content['attachment'].get('url')))
+                            filename=content['attachment'].get('url').split("/")
+                            print(filename)
+                            with open(filename[2], 'wb') as f:
+                                f.write(response.content)
     elif(resourceType=="Organization"):
         if(entity.get('partOf')!=None):
             reference=entity.get('partOf').get('reference').split('/')
