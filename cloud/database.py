@@ -20,7 +20,10 @@ class Connection:
                 host=conf.pg.host,
                 port=_PG_PORT,
                 database=conf.pg.schema,
-            )
+            ),
+            connect_args={
+                'timeout': 10,
+            }
         )
 
     def open_session(self) -> orm.Session:

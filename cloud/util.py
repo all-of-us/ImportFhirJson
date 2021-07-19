@@ -1,3 +1,4 @@
+import json
 import os
 
 import google.cloud.functions.context as cloud_context
@@ -60,3 +61,7 @@ def resource_exists_in_db(resource_id: str, db_conn: database.Connection) -> boo
     db_query = db_sess.query(database.ResourceFile).filter_by(resource_id=resource_id)  # type: Query
     db_sess.close()
     return db_query.count() > 0
+
+
+def obj_to_dict(obj: object) -> dict:
+    return json.loads(json.dumps(obj, default=lambda o: o.__dict__))

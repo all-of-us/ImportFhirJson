@@ -60,7 +60,7 @@ def main(data, ctx: gcf_context.Context):
 
     # init config
     conf = config.Config()
-    print(f'Runtime config: {conf.__dict__}')
+    print(f'Runtime config: {util.obj_to_dict(conf)}')
 
     # print for posterity...
     print(('Runtime arguments: "{"obj": '
