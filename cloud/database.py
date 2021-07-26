@@ -1,6 +1,6 @@
-from sqlalchemy import engine, orm  # root packages
+from sqlalchemy import engine, event, orm  # root packages
 from sqlalchemy.dialects import postgresql
-from sqlalchemy import Column, Integer, String  # column types
+from sqlalchemy import Column, Integer, MetaData, String  # column types
 
 import config
 
@@ -19,7 +19,7 @@ class Connection:
                 password=conf.pg.password,
                 host=conf.pg.host,
                 port=_PG_PORT,
-                database=conf.pg.schema,
+                database=conf.pg.database,
             ),
             connect_args={
                 'timeout': 10,
@@ -32,7 +32,8 @@ class Connection:
         TODO: probably hacky AF.
         :return:
         """
-        return orm.sessionmaker(bind=self._engine)()
+        sess = orm.sessionmaker(bind=self._engine)()  # type: orm.Session
+        return sess
 
 
 BaseModel = orm.declarative_base()

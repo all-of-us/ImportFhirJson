@@ -16,6 +16,7 @@ ENV_PG_HOST = 'PG_HOST'
 ENV_PG_SCHEMA = 'PG_SCHEMA'
 ENV_PG_USER = 'PG_USER'
 ENV_PG_PASSWORD = 'PG_PASSWORD'
+ENV_PG_DATABASE = 'PG_DATABASE'
 
 
 class GCPConfig:
@@ -44,6 +45,7 @@ class PGConfig:
         self.schema = os.environ.get(ENV_PG_SCHEMA)
         self.user = os.environ.get(ENV_PG_USER)
         self.password = os.environ.get(ENV_PG_PASSWORD)
+        self.database = os.environ.get(ENV_PG_DATABASE)
 
 
 class Config:
