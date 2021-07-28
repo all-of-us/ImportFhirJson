@@ -4,15 +4,17 @@ import google.cloud.functions.context as gcf_context
 
 import config
 import database
+import gcf
 import gcs
+import log
 import util
 
 
-def main(data, ctx: gcf_context.Context):
+def main(event_data, ctx: gcf_context.Context):
     """
     Triggered by a file being uploaded into the source GCS bucket
 
-    :param data:
+    :param event_data:
         {
             kind                        : string
             id                          : string
@@ -60,29 +62,35 @@ def main(data, ctx: gcf_context.Context):
 
     # init config
     conf = config.Config()
-    print(f'Runtime config: {util.obj_to_dict(conf)}')
+
+    # construct our event data object
+    event_data = gcf.EventData(event_data)
+    log.init(conf=conf, event_data=event_data)
+
+    log.debug('Runtime config', conf=util.obj_to_dict(conf))
 
     # print for posterity...
-    print(('Runtime arguments: "{"obj": '
-           f'{data}'
-           ', "context: "'
-           f'{ctx}'
-           '"}'))
+    log.debug('Runtime arguments', event_data=event_data, ctx=ctx)
     # determine which object we're interacting with
-    ol = util.extract_object_loc(ctx)
-    print(f'Dealin\' with object: {ol.__dict__}')
+    object_meta = gcf.ObjectMeta(event_data=event_data, ctx=ctx)
+    log.info('Object meta parsed', objec_meta=object_meta.__dict__)
 
     # init gcs conn
-    gcs_conn = gcs.GCS(conf)
+    gcs_conn = gcs.Connection()
 
     # download FHIR file
-    fhir_resource = util.fetch_fhir_gcs_object(object_location=ol, gcs_conn=gcs_conn)
-    print(f'Dealing with resource {json.dumps(fhir_resource.__dict__)}')
+    fhir_resource = util.fetch_fhir_gcs_object(object_meta=object_meta, gcs_conn=gcs_conn)
+    log.info('FHIR Resource parsed', fhir_resource=fhir_resource)
 
     # init db connection
-    db_conn = database.Connection(conf)
-    if util.resource_exists_in_db(fhir_resource.resource_id, db_conn):
-        print('Resource already exists in DB, moving on...')
+    dbm = database.Manager(conf)
+    current = util.fetch_fhir_psql_resource(dbm, fhir_resource.resource_id)
+    if current:
+        log.info('Resource already exists in DB, moving on...')
+        # TODO: at some point may have to do a json value comparison between existing and incoming...
         return
 
-    print('Resource does not already exist in DB, inserting...')
+    log.info('Resource does not already exist in DB, inserting...')
+    resource_file = util.create_psql_resource_entity(fhir_resource, object_meta)
+    dbm.insert_single_entity(entity=resource_file)
+    log.info('New resource successfully inserted!')

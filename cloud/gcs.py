@@ -3,13 +3,12 @@ from google.cloud import storage
 import config
 
 
-class GCS:
+class Connection:
     """
     GCS is a small wrapper around the upstream gcs storage client
     """
 
-    def __init__(self, conf: config.Config):
-        self._conf = conf  # keep local reference to config
+    def __init__(self):
         self.client = storage.Client()  # "allow" "public" access to upstream client
         self._buckets = {}  # buck dict
 
