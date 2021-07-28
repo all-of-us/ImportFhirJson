@@ -1,5 +1,3 @@
-import json
-
 import google.cloud.functions.context as gcf_context
 
 import config
@@ -79,18 +77,18 @@ def main(event_data, ctx: gcf_context.Context):
     gcs_conn = gcs.Connection()
 
     # download FHIR file
-    fhir_resource = util.fetch_fhir_gcs_object(object_meta=object_meta, gcs_conn=gcs_conn)
+    fhir_resource = cloud.gcs.fetch_fhir_gcs_object(object_meta=object_meta, gcs_conn=gcs_conn)
     log.info('FHIR Resource parsed', fhir_resource=fhir_resource)
 
     # init db connection
     dbm = database.Manager(conf)
-    current = util.fetch_fhir_psql_resource(dbm, fhir_resource.resource_id)
+    current = cloud.database.fetch_fhir_psql_resource(dbm, fhir_resource.resource_id)
     if current:
         log.info('Resource already exists in DB, moving on...')
         # TODO: at some point may have to do a json value comparison between existing and incoming...
         return
 
     log.info('Resource does not already exist in DB, inserting...')
-    resource_file = util.create_psql_resource_entity(fhir_resource, object_meta)
+    resource_file = cloud.database.create_psql_resource_entity(fhir_resource, object_meta)
     dbm.insert_single_entity(entity=resource_file)
     log.info('New resource successfully inserted!')
