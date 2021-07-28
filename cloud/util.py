@@ -1,5 +1,4 @@
 import datetime
-import json
 from typing import Optional
 
 RFC3339_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
@@ -43,13 +42,3 @@ def datetime_or_none(src: dict, key: str) -> Optional[datetime.datetime]:
         return gosh_python_is_good_at_time(src[key])
     else:
         return None
-
-
-def obj_to_dict(obj: object) -> dict:
-    """
-    obj_to_dict recursively turns an object into a set of dictionaries
-
-    :param obj: source object
-    :return:
-    """
-    return json.loads(json.dumps(obj, default=lambda o: o.__dict__))

@@ -59,7 +59,7 @@ class GCFConfig:
         self.functionRegion = os.getenv(ENV_X_GOOGLE_FUNCTION_REGION)
         self.functionTimeoutSec = os.getenv(ENV_X_GOOGLE_FUNCTION_TIMEOUT_SEC)
         self.functionTriggerType = os.getenv(ENV_X_GOOGLE_FUNCTION_TRIGGER_TYPE)
-        self.functionVersion = os.getenv(ENV_X_GOOGLE_FUNCTION_VERSION)
+        self.functionVersion = int(os.getenv(ENV_X_GOOGLE_FUNCTION_VERSION, 0))
         self.gcloudProject = os.getenv(ENV_X_GOOGLE_GCLOUD_PROJECT)
         self.gcpProject = os.getenv(ENV_X_GOOGLE_GCP_PROJECT)  # todo: redundant, which is the one to keep?
         self.loadOnStart = os.getenv(ENV_X_GOOGLE_LOAD_ON_START, '').lower() == 'true'

@@ -75,8 +75,10 @@ class ResourceFile(BaseModel):
     resource_type = Column(String, nullable=False, comment='Type of FHIR Resource contained in this file')
     resource_id = Column(String, nullable=False, comment='ID of FHIR Resource contained in this file')
     object_path = Column(String, nullable=False, comment='Full path to FHIR file within bucket')
-    uploaded = Column(TIMESTAMP(timezone=True), nullable=False, comment='Date file uploaded to GCS bucket')
-    inserted = Column(TIMESTAMP(timezone=True), nullable=False, comment='Date record inserted into DB')
+    uploaded = Column(TIMESTAMP(timezone=True), nullable=False,
+                      comment='Timestamp representing when file was uploaded to GCS bucket')
+    processed = Column(TIMESTAMP(timezone=True), nullable=False,
+                       comment='Timestamp representing when file was processed by cloud func')
     meta = Column(postgresql.JSONB, nullable=True, comment='Raw JSON contents of FHIR JSON file')
     bucket = Column(String, nullable=False, comment='Name of GCS bucket file is present in')
 
@@ -101,7 +103,7 @@ def create_psql_resource_entity(fhir_resource: fhir.Resource, object_meta: gcf.O
     resource_file.resource_type = fhir_resource.resource_type
     resource_file.object_path = object_meta.path
     resource_file.uploaded = object_meta.created
-    resource_file.inserted = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    resource_file.processed = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
     resource_file.meta = fhir_resource.raw
     # dumb pythonic ways are dumb.
     resource_file.bucket = object_meta.bucket
@@ -120,7 +122,7 @@ def fetch_fhir_psql_resource(dbm: Manager, resource_id: str) -> Optional[Resourc
     db_sess = dbm.open_session()
     db_query = db_sess.query(ResourceFile) \
         .filter_by(resource_id=resource_id) \
-        .order_by(ResourceFile.inserted.desc())  # type: Query
+        .order_by(ResourceFile.processed.desc())  # type: Query
     res = db_query.one_or_none()
     db_sess.close()
     return res

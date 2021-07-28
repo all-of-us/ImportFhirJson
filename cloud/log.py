@@ -1,8 +1,8 @@
+import inspect
 import json
 
 import config
 import gcf
-import util
 
 _LEVEL_DEBUG = 'DBG'
 _LEVEL_INFO = 'INF'
@@ -39,10 +39,12 @@ def _format_field_value(v):
     :param v: whatever value needs to be dumped
     :return: somethin' dumpable
     """
-    t = type(v)
-    if t == object:
-        return util.obj_to_dict(v)
-    elif t == bool:
+    if inspect.isclass(v):
+        out = {}
+        for k, vv in v.__dict_.items():
+            out[k] = _format_field_value(vv)
+        return out
+    elif type(v) == bool:
         return 'true' if v else 'false'
     else:
         return str(v)
@@ -68,7 +70,7 @@ def _do_log(lvl: str, msg: str, fields: dict) -> None:
         tmp = {}
 
         # loop over each provided field, preventing setting of "private" fields
-        for k, v in fields.items():
+        for _, (k, v) in enumerate(fields.items()):
             if k not in _PRIVATE_FIELDS:
                 tmp[k] = _format_field_value(v)
 
@@ -77,7 +79,7 @@ def _do_log(lvl: str, msg: str, fields: dict) -> None:
             out = {**tmp, **out}
 
     # json encode and print to stdout
-    print(json.dumps(out))
+    print(json.dumps(out, default=lambda o: o.__dict__))
 
 
 def debug(msg: str, **kwargs) -> None:
