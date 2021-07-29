@@ -63,7 +63,10 @@ def main(event_data, ctx: gcf_context.Context):
 
     # construct our event data object
     event_data = gcf.EventData(event_data)
-    log.init(conf=conf, event_data=event_data)
+    log.init(function_name=conf.gcf.functionName,
+             function_version=conf.gcf.functionVersion,
+             gcs_bucket=event_data.bucket,
+             gcs_object_etag=event_data.etag)
 
     log.debug('Runtime config', conf=conf)
 

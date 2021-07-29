@@ -1,17 +1,7 @@
 import datetime
 from typing import Optional
 
-RFC3339_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
-
-
-def gosh_python_is_good_at_time(time_string: str) -> datetime.datetime:
-    """
-    python is really good at time and does a good job and i'm not bitter at all.
-
-    :param time_string: Raw RFC3339-formatted time string
-    :return: timezone aware datetime instance.
-    """
-    return datetime.datetime.strptime(time_string, RFC3339_FORMAT).replace(tzinfo=datetime.timezone.utc)
+import chrono
 
 
 def value_or_default(src: dict, key: str, default):
@@ -39,6 +29,6 @@ def datetime_or_none(src: dict, key: str) -> Optional[datetime.datetime]:
     :return:
     """
     if key in src:
-        return gosh_python_is_good_at_time(src[key])
+        return chrono.then(src[key])
     else:
         return None

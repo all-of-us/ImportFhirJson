@@ -1,85 +1,99 @@
-import inspect
-import json
+from abc import ABC, abstractmethod
+import jsonpickle
 
-import config
-import gcf
+import chrono
 
-_LEVEL_DEBUG = 'DBG'
-_LEVEL_INFO = 'INF'
-_LEVEL_WARN = 'WRN'
-_LEVEL_ERROR = 'ERR'
+# google cloud logging severity level values.
+_GCL_SEVERITY_DEFAULT = 0
+_GCL_SEVERITY_DEBUG = 100
+_GCL_SEVERITY_INFO = 200
+_GCL_SEVERITY_NOTICE = 300
+_GCL_SEVERITY_WARNING = 400
+_GCL_SEVERITY_ERROR = 500
+_GCL_SEVERITY_CRITICAL = 600
+_GCL_SEVERITY_ALERT = 700
+_GCL_SEVERITY_EMERGENCY = 800
 
+# these are the levels we actually care about
+_LEVEL_DEBUG = "DEBUG"
+_LEVEL_INFO = "INFO"
+_LEVEL_WARN = "WARNING"
+_LEVEL_ERROR = "ERROR"
+
+# these are private fields that incoming logging structures cannot overwrite
 _FIELD_MESSAGE = 'message'
-_FIELD_LEVEL = 'level'
+_FIELD_SEVERITY = 'severity'
+_FIELD_TIMESTAMP = 'timestamp'  # must be datetime.datetime instance
 
-_PRIVATE_FIELDS = [_FIELD_LEVEL, _FIELD_MESSAGE]
+_PRIVATE_FIELDS = {_FIELD_SEVERITY, _FIELD_MESSAGE, _FIELD_TIMESTAMP}
 
-_base_dict = {}
+# contains our base logging fields
+_base_fields = {}
 
 
-def init(conf: config.Config, event_data: gcf.EventData) -> None:
+class LoggableObject:
+    @abstractmethod
+    def to_log_dict(self) -> dict:
+        """
+        Must be implemented by child classes to print their contents to a structured log file
+        :return:
+        """
+        pass
+
+
+def init(function_name: str, function_version: int, gcs_bucket: str, gcs_object_etag: str) -> None:
     """
     init initializes our cloud func logger
 
-    :param conf: this runtime's configuration
-    :param event_data: this runtime's event metadata
+    :param function_name: name of function
+    :param function_version: version of function at runtime
+    :param gcs_bucket: name of bucket containing object that triggered this runtime
+    :param gcs_object_etag: etag of object
     :return:
     """
-    global _base_dict
-    _base_dict['function_name'] = conf.gcf.functionName
-    _base_dict['function_version'] = conf.gcf.functionVersion
-    _base_dict['gcs_bucket'] = event_data.bucket
-    _base_dict['gcs_object_etag'] = event_data.etag
+    global _base_fields
+
+    # init base dict
+    _base_fields['function_name'] = function_name
+    _base_fields['function_version'] = function_version
+    _base_fields['gcs_bucket'] = gcs_bucket
+    _base_fields['gcs_object_etag'] = gcs_object_etag
 
 
-def _format_field_value(v):
-    """
-    _format_field_value attempts to return a json-dumpable value from the input
-
-    :param v: whatever value needs to be dumped
-    :return: somethin' dumpable
-    """
-    if inspect.isclass(v):
-        out = {}
-        for k, vv in v.__dict_.items():
-            out[k] = _format_field_value(vv)
-        return out
-    elif type(v) == bool:
-        return 'true' if v else 'false'
-    else:
-        return str(v)
-
-
-def _do_log(lvl: str, msg: str, fields: dict) -> None:
+def _do_log(severity: str, msg: str, fields: dict) -> None:
     """
     _do_log do's the logging.
 
-    :param lvl: level of this message
+    :param severity: level of this message
     :param msg: free text message of the message
     :param fields: structured fields of the message.  these cannot and will not override "private" fields.
     :return: nothin'
     """
+
     # build base output dict
-    out = _base_dict.copy()
-    out[_FIELD_LEVEL] = lvl
+    out = _base_fields.copy()
+    out[_FIELD_SEVERITY] = severity
     out[_FIELD_MESSAGE] = msg
+    out[_FIELD_TIMESTAMP] = chrono.now_str()
 
     # build log field map
-    if fields:
+    if len(fields) > 0:
         # build temp dict for field storage
         tmp = {}
 
         # loop over each provided field, preventing setting of "private" fields
-        for _, (k, v) in enumerate(fields.items()):
+        for k, v in fields.items():
             if k not in _PRIVATE_FIELDS:
-                tmp[k] = _format_field_value(v)
+                tmp[k] = v
 
         # if there was at least 1 non-private field defined, add them to "out"
         if len(tmp) > 0:
             out = {**tmp, **out}
 
     # json encode and print to stdout
-    print(json.dumps(out, default=lambda o: o.__dict__))
+    print(jsonpickle.dumps(value=out,
+                           unpicklable=False,
+                           indent=None))
 
 
 def debug(msg: str, **kwargs) -> None:
@@ -90,7 +104,7 @@ def debug(msg: str, **kwargs) -> None:
     :param kwargs: the fields
     :return: nothin'
     """
-    _do_log(lvl=_LEVEL_DEBUG, msg=msg, fields=kwargs)
+    _do_log(severity=_LEVEL_DEBUG, msg=msg, fields=kwargs)
 
 
 def info(msg: str, **kwargs) -> None:
@@ -101,7 +115,7 @@ def info(msg: str, **kwargs) -> None:
     :param kwargs: the fields
     :return: nothin'
     """
-    _do_log(lvl=_LEVEL_INFO, msg=msg, fields=kwargs)
+    _do_log(severity=_LEVEL_INFO, msg=msg, fields=kwargs)
 
 
 def warn(msg: str, **kwargs) -> None:
@@ -112,7 +126,7 @@ def warn(msg: str, **kwargs) -> None:
     :param kwargs: the fields
     :return: nothin'
     """
-    _do_log(lvl=_LEVEL_WARN, msg=msg, fields=kwargs)
+    _do_log(severity=_LEVEL_WARN, msg=msg, fields=kwargs)
 
 
 def error(msg: str, **kwargs) -> None:
@@ -123,4 +137,4 @@ def error(msg: str, **kwargs) -> None:
     :param kwargs: the fields
     :return: nothin'
     """
-    _do_log(lvl=_LEVEL_ERROR, msg=msg, fields=kwargs)
+    _do_log(severity=_LEVEL_ERROR, msg=msg, fields=kwargs)
