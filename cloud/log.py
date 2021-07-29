@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 import jsonpickle
 
 import chrono
@@ -31,14 +32,37 @@ _PRIVATE_FIELDS = {_FIELD_SEVERITY, _FIELD_MESSAGE, _FIELD_TIMESTAMP}
 _base_fields = {}
 
 
-class LoggableObject:
+class LoggableObject(ABC):
     @abstractmethod
-    def to_log_dict(self) -> dict:
+    def to_loggable_dict(self) -> dict:
         """
         Must be implemented by child classes to print their contents to a structured log file
         :return:
         """
         pass
+
+
+class LoggableObjectLogHandler(jsonpickle.handlers.BaseHandler):
+    def restore(self, obj):
+        """
+        restore is purposefully not implemented as we do not unserialize into from json
+        into these types
+
+        :param obj:
+        :return:
+        """
+        raise NotImplementedError('Restore functionality is purposefully not implemented')
+
+    def flatten(self, obj: LoggableObject, data):
+        """
+        flatten looks for classes that extend the LoggableObject class to filter the
+        logged fields of that object
+
+        :param obj: some kinda object
+        :param data: jsonpickle metadata
+        :return:
+        """
+        return obj.to_loggable_dict()
 
 
 def init(function_name: str, function_version: int, gcs_bucket: str, gcs_object_etag: str) -> None:
@@ -58,6 +82,11 @@ def init(function_name: str, function_version: int, gcs_bucket: str, gcs_object_
     _base_fields['function_version'] = function_version
     _base_fields['gcs_bucket'] = gcs_bucket
     _base_fields['gcs_object_etag'] = gcs_object_etag
+
+    # register custom jsonpickle handler
+    jsonpickle.handlers.register(cls=LoggableObject,
+                                 handler=LoggableObjectLogHandler,
+                                 base=True)
 
 
 def _do_log(severity: str, msg: str, fields: dict) -> None:

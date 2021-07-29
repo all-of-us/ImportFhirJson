@@ -1,5 +1,7 @@
 import os
 
+import log
+
 # custom envvars
 ENV_PG_HOST = 'PG_HOST'
 ENV_PG_SCHEMA = 'PG_SCHEMA'
@@ -68,7 +70,7 @@ class GCFConfig:
         self.workerPort = int(os.getenv(ENV_X_GOOGLE_WORKER_PORT, 0))
 
 
-class PGConfig:
+class PGConfig(log.LoggableObject):
     """
     PGConfig contains all necessary PSQL configuration
     """
@@ -79,6 +81,21 @@ class PGConfig:
         self.user = os.getenv(ENV_PG_USER)
         self.password = os.getenv(ENV_PG_PASSWORD)
         self.database = os.getenv(ENV_PG_DATABASE)
+
+    def to_loggable_dict(self) -> dict:
+        """
+        to_loggable_dict fulfills the LoggableObject "interface", allowing us to filter
+        out the password when using our logger
+
+        :return:
+        """
+        return {
+            'host': self.host,
+            'schema': self.schema,
+            'user': self.user,
+            'password': '**REDACTED**',
+            'database': self.database,
+        }
 
 
 class Config:
