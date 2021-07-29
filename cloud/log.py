@@ -21,6 +21,16 @@ _LEVEL_INFO = "INFO"
 _LEVEL_WARN = "WARNING"
 _LEVEL_ERROR = "ERROR"
 
+# _LEVEL_DEBUG = logging.DEBUG
+# _LEVEL_INFO = logging.INFO
+# _LEVEL_WARN = logging.WARN
+# _LEVEL_ERROR = logging.ERROR
+
+# _LEVEL_DEBUG = _GCL_SEVERITY_DEBUG
+# _LEVEL_INFO = _GCL_SEVERITY_INFO
+# _LEVEL_WARN = _GCL_SEVERITY_WARNING
+# _LEVEL_ERROR = _GCL_SEVERITY_ERROR
+
 # these are private fields that incoming logging structures cannot overwrite
 _FIELD_MESSAGE = 'message'
 _FIELD_SEVERITY = 'severity'
@@ -42,7 +52,7 @@ class LoggableObject(ABC):
         pass
 
 
-class LoggableObjectLogHandler(jsonpickle.handlers.BaseHandler):
+class LoggableObjectPickleHandler(jsonpickle.handlers.BaseHandler):
     def restore(self, obj):
         """
         restore is purposefully not implemented as we do not unserialize into from json
@@ -85,7 +95,7 @@ def init(function_name: str, function_version: int, gcs_bucket: str, gcs_object_
 
     # register custom jsonpickle handler
     jsonpickle.handlers.register(cls=LoggableObject,
-                                 handler=LoggableObjectLogHandler,
+                                 handler=LoggableObjectPickleHandler,
                                  base=True)
 
 
@@ -101,6 +111,7 @@ def _do_log(severity: str, msg: str, fields: dict) -> None:
 
     # build base output dict
     out = _base_fields.copy()
+
     out[_FIELD_SEVERITY] = severity
     out[_FIELD_MESSAGE] = msg
     out[_FIELD_TIMESTAMP] = chrono.now_str()
