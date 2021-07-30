@@ -121,7 +121,7 @@ def main(event_data, ctx: gcf_context.Context):
     gcs_conn = gcs.Connection()
 
     # download FHIR file
-    fhir_resource = gcs.fetch_fhir_gcs_object(object_meta=object_meta, gcs_conn=gcs_conn)
+    fhir_resource = fetch_fhir_gcs_object(object_meta=object_meta, gcs_conn=gcs_conn)
     log.info('FHIR Resource parsed', fhir_resource=fhir_resource)
 
     # init db connection
