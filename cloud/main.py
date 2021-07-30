@@ -1,11 +1,52 @@
+import datetime
+
 import google.cloud.functions.context as gcf_context
 
 import config
 import database
+import fhir
 import gcf
 import gcs
 import log
-import util
+
+
+def fetch_fhir_gcs_object(object_meta: gcf.ObjectMeta, gcs_conn: gcs.Connection) -> fhir.Resource:
+    """
+    fetch_fhir_gcs_object attempts to fetch the raw bytes for a given FHIR object in GCS,
+    then attempts to decode it into fhir.Resource type
+
+    :param ObjectLocation object_meta: object of interest
+    :param gcs_conn: exiting GCS connection
+    :return: fhir.Resource instance
+    """
+    buck = gcs_conn.bucket(object_meta.bucket)
+    obj = buck.get_blob(object_meta.path)
+    b = obj.download_as_bytes()
+    return fhir.Resource(b)
+
+
+def create_psql_resource_entity(fhir_resource: fhir.Resource, object_meta: gcf.ObjectMeta) -> database.ResourceFile:
+    """
+    create_psql_resource_entity constructs a new ResourceFile entity, ready to be persisted into postgres
+
+    :param fhir_resource: Source resource file
+    :param object_meta: Object location metadata
+    :return: Constructed ResourceFile instance
+    """
+
+    # construct new ResourceFile
+    resource_file = database.ResourceFile()
+
+    # populate
+    resource_file.resource_id = fhir_resource.resource_id
+    resource_file.resource_type = fhir_resource.resource_type
+    resource_file.object_path = object_meta.path
+    resource_file.uploaded = object_meta.created
+    resource_file.processed = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
+    resource_file.meta = fhir_resource.raw
+    resource_file.bucket = object_meta.bucket
+
+    return resource_file
 
 
 def main(event_data, ctx: gcf_context.Context):
@@ -92,6 +133,6 @@ def main(event_data, ctx: gcf_context.Context):
         return
 
     log.info('Resource does not already exist in DB, inserting...')
-    resource_file = database.create_psql_resource_entity(fhir_resource, object_meta)
+    resource_file = create_psql_resource_entity(fhir_resource, object_meta)
     dbm.insert_single_entity(entity=resource_file)
     log.info('New resource successfully inserted!')

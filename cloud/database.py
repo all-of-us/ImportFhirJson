@@ -1,16 +1,13 @@
-import datetime
 from typing import Optional
 
-from sqlalchemy import engine, event, orm  # root packages
+from sqlalchemy import engine, orm  # root packages
 from sqlalchemy.dialects import postgresql
 from sqlalchemy import Column, Integer, String, TIMESTAMP  # column types
 
 import config
-import fhir
-import gcf
 
 _PG_DRIVER = 'postgresql+pg8000'
-_PG_PORT = 5432  # TODO: make configurable
+_PG_PORT = 5432  # does not need to be configurable as gcp cloud sql uses idiomatic default ports for databases.
 
 _RESOURCE_FILE_TABLE = 'resource_files'
 
@@ -84,31 +81,6 @@ class ResourceFile(BaseModel):
 
     def __repr__(self):
         return self.meta
-
-
-def create_psql_resource_entity(fhir_resource: fhir.Resource, object_meta: gcf.ObjectMeta) -> ResourceFile:
-    """
-    create_psql_resource_entity constructs a new ResourceFile entity, ready to be persisted into postgres
-
-    :param fhir_resource: Source resource file
-    :param object_meta: Object location metadata
-    :return: Constructed ResourceFile instance
-    """
-
-    # construct new ResourceFile
-    resource_file = ResourceFile()
-
-    # populate
-    resource_file.resource_id = fhir_resource.resource_id
-    resource_file.resource_type = fhir_resource.resource_type
-    resource_file.object_path = object_meta.path
-    resource_file.uploaded = object_meta.created
-    resource_file.processed = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
-    resource_file.meta = fhir_resource.raw
-    # dumb pythonic ways are dumb.
-    resource_file.bucket = object_meta.bucket
-
-    return resource_file
 
 
 def fetch_fhir_psql_resource(dbm: Manager, resource_id: str) -> Optional[ResourceFile]:
