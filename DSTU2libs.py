@@ -16,8 +16,8 @@ def fixEntity(conn,entity,args):
             successful="removeFile"
             pass
         reference=entity.get('subject').get('reference').split('/')
-        referenceType=reference[-1]
-        referenceID=reference[-2]
+        referenceType=reference[-2]
+        referenceID=reference[-1]
         c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
         result=c.fetchone()
         if(result):
@@ -34,8 +34,8 @@ def fixEntity(conn,entity,args):
         #         for ingredient in entity.get('product').get('ingredient'):
         #             if(ingredient.get('item')!=None):
         #                 reference=ingredient.get('item').get('reference').split('/')
-        #                 referenceType=reference[-1]
-        #                 referenceID=reference[-2]
+        #                 referenceType=reference[-2]
+        #                 referenceID=reference[-1]
         #                 c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
         #                 result=c.fetchone()
         #                 if(result):
@@ -47,8 +47,8 @@ def fixEntity(conn,entity,args):
     elif(resourceType=="Condition"):
         if(entity.get('patient')!=None):
             reference=entity.get('patient').get('reference').split('/')
-            referenceType=reference[-1]
-            referenceID=reference[-2]
+            referenceType=reference[-2]
+            referenceID=reference[-1]
             c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
             result=c.fetchone()
             if(result):
@@ -56,11 +56,22 @@ def fixEntity(conn,entity,args):
                 entity['patient']['reference']="{}/{}".format(referenceType,referenceID)
             else:
                 successful="notSuccess"
+        if(entity.get('asserter')!=None):
+            reference=entity.get('asserter').get('reference').split('/')
+            referenceType=reference[-2]
+            referenceID=reference[-1]
+            c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+            result=c.fetchone()
+            if(result):
+                referenceID=result[2]
+                entity['asserter']['reference']="{}/{}".format(referenceType,referenceID)
+            else:
+                successful="notSuccess"
     elif(resourceType=="Encounter"):
         if(entity.get('patient')!=None):
             reference=entity.get('patient').get('reference').split('/')
-            referenceType=reference[-1]
-            referenceID=reference[-2]
+            referenceType=reference[-2]
+            referenceID=reference[-1]
             c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
             result=c.fetchone()
             if(result):
@@ -71,8 +82,8 @@ def fixEntity(conn,entity,args):
         if(entity.get('indication')!=None):
             for indication in entity.get('indication'):
                 reference=indication.get('reference').split('/')
-                referenceType=reference[-1]
-                referenceID=reference[-2]
+                referenceType=reference[-2]
+                referenceID=reference[-1]
                 c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
                 result=c.fetchone()
                 if(result):
@@ -87,8 +98,8 @@ def fixEntity(conn,entity,args):
             successful="removeFile"
             pass
         reference=entity.get('subject').get('reference').split('/')
-        referenceType=reference[-1]
-        referenceID=reference[-2]
+        referenceType=reference[-2]
+        referenceID=reference[-1]
         c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
         result=c.fetchone()
         if(result):
@@ -99,8 +110,8 @@ def fixEntity(conn,entity,args):
     elif(resourceType=="MedicationStatement"):
         if(entity.get('patient')!=None):
             reference=entity.get('patient').get('reference').split('/')
-            referenceType=reference[-1]
-            referenceID=reference[-2]
+            referenceType=reference[-2]
+            referenceID=reference[-1]
             c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
             result=c.fetchone()
             if(result):
@@ -122,8 +133,8 @@ def fixEntity(conn,entity,args):
             entity['dateEnded']=entity.get('dateWritten')
         if(entity.get('patient')!=None):
             reference=entity.get('patient').get('reference').split('/')
-            referenceType=reference[-1]
-            referenceID=reference[-2]
+            referenceType=reference[-2]
+            referenceID=reference[-1]
             c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
             result=c.fetchone()
             if(result):
@@ -131,13 +142,35 @@ def fixEntity(conn,entity,args):
                 entity['patient']['reference']="{}/{}".format(referenceType,referenceID)
             else:
                 successful="notSuccess"
+        if(entity.get('prescriber')!=None):
+            reference=entity.get('prescriber').get('reference').split('/')
+            referenceType=reference[-2]
+            referenceID=reference[-1]
+            c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+            result=c.fetchone()
+            if(result):
+                referenceID=result[2]
+                entity['prescriber']['reference']="{}/{}".format(referenceType,referenceID)
+            else:
+                successful="notSuccess"
+        if(entity.get('medicationReference')!=None):
+            reference=entity.get('medicationReference').get('reference').split('/')
+            referenceType=reference[-2]
+            referenceID=reference[-1]
+            c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+            result=c.fetchone()
+            if(result):
+                referenceID=result[2]
+                entity['medicationReference']['reference']="{}/{}".format(referenceType,referenceID)
+            else:
+                successful="notSuccess"
     elif(resourceType=="Device"):
         print("we don't allow posting of Devices currently")
         successful="removeFile"
         # if(entity.get('patient')!=None):
         #     reference=entity.get('patient').get('reference').split('/')
-        #     referenceType=reference[-1]
-        #     referenceID=reference[-2]
+        #     referenceType=reference[-2]
+        #     referenceID=reference[-1]
         #     c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
         #     result=c.fetchone()
         #     if(result):
@@ -159,8 +192,8 @@ def fixEntity(conn,entity,args):
             successful="removeFile"
             pass
         reference=entity.get('subject').get('reference').split('/')
-        referenceType=reference[-1]
-        referenceID=reference[-2]
+        referenceType=reference[-2]
+        referenceID=reference[-1]
         c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
         result=c.fetchone()
         if(result):
@@ -172,8 +205,8 @@ def fixEntity(conn,entity,args):
     elif(resourceType=="DocumentReference"):
         if(entity.get('subject')!=None):
             reference=entity.get('subject').get('reference').split('/')
-            referenceType=reference[-1]
-            referenceID=reference[-2]
+            referenceType=reference[-2]
+            referenceID=reference[-1]
             c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
             result=c.fetchone()
             if(result):
@@ -184,8 +217,8 @@ def fixEntity(conn,entity,args):
         if(entity.get('author')!=None):
             for author in entity.get('author'):
                 reference=author.get('reference').split('/')
-                referenceType=reference[-1]
-                referenceID=reference[-2]
+                referenceType=reference[-2]
+                referenceID=reference[-1]
                 c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
                 result=c.fetchone()
                 if(result):
@@ -209,8 +242,8 @@ def fixEntity(conn,entity,args):
     elif(resourceType=="Organization"):
         if(entity.get('partOf')!=None):
             reference=entity.get('partOf').get('reference').split('/')
-            referenceType=reference[-1]
-            referenceID=reference[-2]
+            referenceType=reference[-2]
+            referenceID=reference[-1]
             c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
             result=c.fetchone()
             if(result):
