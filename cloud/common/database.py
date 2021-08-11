@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 from sqlalchemy import engine, orm  # root packages
 from sqlalchemy.dialects import postgresql
@@ -36,6 +36,9 @@ class Manager:
         """
         sess = orm.sessionmaker(bind=self._engine)()  # type: orm.Session
         return sess
+
+    def close(self) -> None:
+        self._engine.dispose()
 
     def insert_single_entity(self, entity) -> None:
         """

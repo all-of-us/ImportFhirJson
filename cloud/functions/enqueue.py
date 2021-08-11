@@ -2,12 +2,7 @@ import datetime
 
 import google.cloud.functions.context as gcf_context
 
-import config
-import database
-import fhir
-import gcf
-import gcs
-import log
+from cloud.common import config, database, fhir, gcf, gcs, log
 
 
 def fetch_fhir_gcs_object(object_meta: gcf.ObjectMeta, gcs_conn: gcs.Connection) -> fhir.Resource:
@@ -135,4 +130,5 @@ def main(event_data, ctx: gcf_context.Context):
     log.info('Resource does not already exist in DB, inserting...')
     resource_file = create_psql_resource_entity(fhir_resource, object_meta)
     dbm.insert_single_entity(entity=resource_file)
+    dbm.close()
     log.info('New resource successfully inserted!')
