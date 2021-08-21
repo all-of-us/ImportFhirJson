@@ -25,6 +25,18 @@ def fixEntity(conn,entity,args):
             entity['subject']['reference']="{}/{}".format(referenceType,referenceID)
         else:
             successful="notSuccess"
+        for performer in entity.get('performer'):
+                reference=performer.get('reference').split('/')
+                referenceType=reference[-2]
+                referenceID=reference[-1]
+                c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+                result=c.fetchone()
+                if(result):
+                    referenceID=result[2]
+                    performer['reference']="{}/{}".format(referenceType,referenceID)
+                else:
+                    successful="notSuccess"
+                    break
     elif(resourceType=="Medication"):
         print("we don't handle medications")
         successful="removeFile"
