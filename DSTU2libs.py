@@ -9,7 +9,19 @@ def fixEntity(conn,entity,args):
     resourceType=entity.get('resourceType')
     successful="success"
     if(resourceType=="Patient"):
-        pass
+        if(entity.get('careProvider')!=None):
+            for provider in entity.get('careProvider'):
+                    reference=provider.get('reference').split('/')
+                    referenceType=reference[-2]
+                    referenceID=reference[-1]
+                    c.execute("SELECT * from IDMap WHERE oldID='{}' AND resourceType='{}';".format(referenceID,referenceType))
+                    result=c.fetchone()
+                    if(result):
+                        referenceID=result[2]
+                        provider['reference']="{}/{}".format(referenceType,referenceID)
+                    else:
+                        successful="notSuccess"
+                        break
     elif(resourceType=="Observation"):
         if(entity.get('effectiveDateTime')==None):
             print("Cannot import this file, needs effectiveDateTime")
